@@ -1,0 +1,55 @@
+# Accessible Services Navigator Configuration
+
+# Model Configuration
+model:
+  name: "gemini-2.5-flash"
+  temperature: 0.7
+  retry_attempts: 5
+  retry_exp_base: 7
+  retry_initial_delay: 1
+  retry_http_codes: [429, 500, 503, 504]
+
+# Agent Configuration
+agents:
+  intake:
+    name: "intake_profile_agent"
+    description: "Extracts and structures user profile information"
+
+  search:
+    name: "search_agent"
+    description: "Searches and filters facilities based on user needs"
+    max_candidates: 10
+
+  reasoning:
+    name: "reasoning_summary_agent"
+    description: "Scores facilities and generates context summaries"
+    context_compaction_enabled: true
+
+  recommendation:
+    name: "recommendation_agent"
+    description: "Generates user-facing recommendations"
+    top_facilities_count: 3
+
+# Memory Configuration
+memory:
+  session_service: "InMemorySessionService"
+  memory_service: "InMemoryMemoryService"
+  retention_days: 30
+
+# Dataset Configuration
+dataset:
+  clinics_file: "nairobi_clinics.csv"
+  social_services_file: "nairobi_social_services.csv"
+  consolidated_file: "nairobi_accessible_services.parquet"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  file: "logs/agent_traces.log"
+  format: "json"
+  enable_tracing: true
+
+# Evaluation Configuration
+evaluation:
+  scenarios_file: "tests/evaluation/test_scenarios.yaml"
+  output_dir: "tests/evaluation/results"

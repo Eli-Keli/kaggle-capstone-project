@@ -1,0 +1,29 @@
+# Core ADK and AI dependencies
+google-adk[a2a]
+google-genai
+opentelemetry-instrumentation-google-genai
+
+# Data processing
+pandas>=2.0.0
+pyarrow>=12.0.0
+
+# Schema validation
+pydantic>=2.0.0
+
+# Configuration
+python-dotenv>=1.0.0
+pyyaml>=6.0
+
+# Testing and evaluation
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Logging
+structlog>=23.1.0
+
+# Web search (if needed beyond ADK built-in)
+requests>=2.31.0
+
+# CLI interface
+click>=8.1.0
+rich>=13.0.0

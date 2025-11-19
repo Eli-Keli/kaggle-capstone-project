@@ -1,0 +1,174 @@
+# Evaluation Test Scenarios for Accessible Services Navigator
+# These scenarios test the system across different disability types,
+# locations, and requirements to ensure comprehensive coverage.
+
+scenarios:
+  - id: wheelchair_embakasi
+    name: "Wheelchair User in Embakasi East"
+    description: "User with mobility impairment seeking affordable clinic in Embakasi East"
+    query: "I use a wheelchair and live in Embakasi East. I need an affordable clinic for a check-up."
+    expected_outcomes:
+      disability_type: "mobility"
+      preferred_subcounty: "Embakasi East"
+      service_category: "clinic"
+      must_have_features:
+        - "ramp"
+        - "accessible toilet"
+      success_criteria:
+        - "At least one facility recommended"
+        - "Facilities in Embakasi East or nearby"
+        - "Accessibility features mentioned"
+        - "Cost information provided"
+
+  - id: deaf_cbd_ncpwd
+    name: "Deaf User Seeking NCPWD Office"
+    description: "Deaf person needing NCPWD office with sign language support in CBD"
+    query: "I am deaf and need to visit the NCPWD office in the CBD. Do they have sign language interpreters?"
+    expected_outcomes:
+      disability_type: "hearing"
+      preferred_subcounty: "Starehe"
+      service_category: "ncpwd_office"
+      must_have_features:
+        - "sign language support"
+      success_criteria:
+        - "NCPWD office recommended"
+        - "Sign language support mentioned"
+        - "Available days/times for interpreters"
+        - "Location in CBD/Starehe"
+
+  - id: blind_westlands
+    name: "Blind User in Westlands"
+    description: "Visually impaired person seeking accessible health center in Westlands"
+    query: "I'm blind and looking for a health center in Westlands that has good signage and staff who can guide me."
+    expected_outcomes:
+      disability_type: "visual"
+      preferred_subcounty: "Westlands"
+      service_category: "clinic"
+      must_have_features:
+        - "clear signage"
+        - "helpful staff"
+      success_criteria:
+        - "Westlands facility recommended"
+        - "Signage quality mentioned"
+        - "Staff assistance highlighted"
+        - "Navigation guidance provided"
+
+  - id: parent_langata
+    name: "Parent with Child in Langata"
+    description: "Parent seeking child-friendly accessible clinic in Langata"
+    query: "My 8-year-old daughter uses a wheelchair. We need a clinic in Langata that is accessible for children."
+    expected_outcomes:
+      disability_type: "mobility"
+      preferred_subcounty: "Langata"
+      service_category: "clinic"
+      must_have_features:
+        - "ramp"
+        - "child-friendly"
+      success_criteria:
+        - "Langata facility recommended"
+        - "Child accessibility mentioned"
+        - "Family-friendly tone"
+        - "Pediatric services if available"
+
+  - id: hearing_dagoretti
+    name: "Hearing-Impaired in Dagoretti North"
+    description: "Person with hearing impairment seeking social services in Dagoretti"
+    query: "I have hearing problems and need to apply for disability certificate at social services office in Dagoretti."
+    expected_outcomes:
+      disability_type: "hearing"
+      preferred_subcounty: "Dagoretti North"
+      service_category: "social_services"
+      must_have_features:
+        - "sign language support"
+      success_criteria:
+        - "Social services or NCPWD office recommended"
+        - "Dagoretti or nearby location"
+        - "Disability certificate process mentioned"
+        - "Communication accessibility noted"
+
+  - id: mobility_kibra
+    name: "Limited Mobility in Kibra"
+    description: "Person with limited mobility seeking accessible clinic in Kibra"
+    query: "I have trouble walking and need a clinic in Kibra that doesn't have many steps."
+    expected_outcomes:
+      disability_type: "mobility"
+      preferred_subcounty: "Kibra"
+      service_category: "clinic"
+      must_have_features:
+        - "ramp or ground floor"
+      success_criteria:
+        - "Kibra facility recommended"
+        - "Step-free access mentioned"
+        - "Alternative arrangements if no ramp"
+        - "Practical accessibility notes"
+
+  - id: low_income_mathare
+    name: "Low-Income Wheelchair User in Mathare"
+    description: "Wheelchair user seeking free or very affordable services in Mathare"
+    query: "I use wheelchair and live in Mathare. I need free clinic because I have no money."
+    expected_outcomes:
+      disability_type: "mobility"
+      preferred_subcounty: "Mathare"
+      service_category: "clinic"
+      cost_preference: "free"
+      must_have_features:
+        - "ramp"
+        - "free or very low cost"
+      success_criteria:
+        - "Free/county facilities prioritized"
+        - "Mathare or nearby location"
+        - "Cost clearly stated as free"
+        - "Accessibility features confirmed"
+
+  - id: visual_upper_hill
+    name: "Visually Impaired in Upper Hill"
+    description: "Blind person seeking NCPWD office in Upper Hill"
+    query: "I am blind and want to go to NCPWD main office in Upper Hill. How accessible is it?"
+    expected_outcomes:
+      disability_type: "visual"
+      preferred_subcounty: "Upper Hill"
+      service_category: "ncpwd_office"
+      must_have_features:
+        - "accessible signage"
+        - "staff assistance"
+      success_criteria:
+        - "NCPWD Upper Hill office recommended"
+        - "Visual accessibility features detailed"
+        - "Navigation instructions provided"
+        - "Staff assistance mentioned"
+
+  - id: wheelchair_westlands_moderate
+    name: "Wheelchair User in Westlands (Moderate Budget)"
+    description: "Wheelchair user seeking quality clinic in Westlands, can pay moderate fees"
+    query: "I use a wheelchair and live in Westlands. I can pay for a good clinic with proper accessibility."
+    expected_outcomes:
+      disability_type: "mobility"
+      preferred_subcounty: "Westlands"
+      service_category: "clinic"
+      cost_preference: "moderate"
+      must_have_features:
+        - "ramp"
+        - "lift"
+        - "accessible toilet"
+      success_criteria:
+        - "Westlands facilities recommended"
+        - "High-quality accessibility features"
+        - "Moderate cost range mentioned"
+        - "Premium features highlighted"
+
+  - id: multiple_needs_embakasi_west
+    name: "Multiple Accessibility Needs in Embakasi West"
+    description: "Person with mobility and hearing impairments in Embakasi West"
+    query: "I have difficulty walking and I'm also hard of hearing. I need a clinic in Embakasi West that can accommodate both."
+    expected_outcomes:
+      disability_type: "mobility"  # Primary
+      preferred_subcounty: "Embakasi West"
+      service_category: "clinic"
+      must_have_features:
+        - "ramp"
+        - "sign language or visual aids"
+      success_criteria:
+        - "Embakasi West facility recommended"
+        - "Both mobility and hearing needs addressed"
+        - "Multi-accessibility features mentioned"
+        - "Communication options detailed"

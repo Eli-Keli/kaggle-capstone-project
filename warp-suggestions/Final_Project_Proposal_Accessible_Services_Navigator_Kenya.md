@@ -1,170 +1,328 @@
-# Accessible Services Navigator: Multi-Agent Assistant for Kenyan Persons with Disabilities
+# Accessible Services Navigator (Nairobi): Multi-Agent Assistant for Disability-Inclusive Services
 
 **Track:** Agents for Good  
-**Title (for Kaggle):** Accessible Services Navigator: Multi-Agent Assistant for Kenyan PWDs  
-**Subtitle (for Kaggle):** Helping Kenyan persons with disabilities discover accessible services, benefits, and support using AI agents built with Google’s ADK.
+**Title (for Kaggle):** Accessible Services Navigator (Nairobi)  
+**Subtitle (for Kaggle):** A multi-agent ADK system that helps persons with disabilities in Nairobi find accessible clinics and social services.
 
-## 1. Problem and Motivation
+---
 
-In Kenya, persons with disabilities (PWDs) and their caregivers often struggle to find clear, up-to-date information about services that are genuinely accessible to them. Details about ramps, sign-language interpreters, tactile paving, accessible toilets, or quiet waiting areas are rarely centralised. Instead, PWDs rely on informal networks—asking friends, community health volunteers, or local WhatsApp groups—to answer basic questions such as:
+## 1. Project Scope and Objectives
 
-- Which public hospital near me has wheelchair access and accessible toilets?
-- Where can I register for an NCPWD card, and what documents do I need?
-- Are there disability-friendly legal aid or social protection desks in my county?
+This project designs and implements a **Nairobi-only** Accessible Services Navigator as a realistic Capstone MVP.
 
-This information barrier leads to wasted time, higher transport costs, and exclusion from health, education, and social protection systems. An AI agentic system can help bridge this information gap by aggregating scattered data sources and reasoning about accessibility for different disability profiles.
+- **Geographic scope:** Nairobi County only (subcounties/wards such as Westlands, Dagoretti North, Embakasi, CBD).
+- **Service scope:** Public and low-cost **clinics**, **hospitals**, and **social service offices** (e.g., NCPWD registration points, social protection desks) within Nairobi.
+- **Users:** Persons with disabilities (PWDs) and caregivers living in Nairobi who need to locate services that match their accessibility needs.
+- **Goal:** Build a concrete, reproducible, data-backed **multi-agent system in a Kaggle Notebook** that demonstrates ADK concepts (multi-agent orchestration, tools, memory, evaluation, observability) while solving a focused problem.
 
-## 2. Proposed Solution (High-Level)
+Nairobi-only scope is a deliberate design choice: it keeps the dataset small enough to curate with reasonable quality, allows deeper evaluation per facility, and is well within the constraints of a single Capstone project.
 
-We propose an **Accessible Services Navigator**: a multi-agent assistant that helps Kenyan PWDs (and their families or support workers) discover nearby services that match their specific accessibility needs, and guides them through next steps.
+---
 
-From a user’s perspective:
+## 2. Problem Statement: Discovering Accessible Services in Nairobi
 
-1. The agent asks short, clear questions about location, disability type, mobility/communication needs, and preferred language.
-2. It searches structured and unstructured sources (datasets plus web pages) for services in the user’s county or town.
-3. It reasons about which services are likely to be usable, given the user’s profile (e.g., wheelchair user vs. blind user).
-4. It returns a ranked list of options with:
-   - Accessibility notes (e.g., ramp present, sign-language support, low stairs only).
-   - Practical details (opening hours, approximate costs, what to bring).
-   - Simple wording that can be read aloud by screen readers.
+PWDs in Nairobi face several recurring, well-defined problems when trying to access public services:
 
-The project will be implemented in a Kaggle Notebook or GitHub repo using the **Agent Development Kit (ADK)**.
+- **Fragmented information:** Clinic and social service information is distributed across ministry websites, PDFs, NGO brochures, and informal lists. There is no single, disability-aware directory for Nairobi.
+- **Accessibility uncertainty:** Online listings rarely specify ramps, lifts, accessible toilets, sign-language support, or sensory-friendly spaces. Users cannot tell if a facility is realistically usable for their disability.
+- **Bureaucratic navigation challenges:** Requirements for services (NCPWD card registration, social protection enrolment, clinic procedures) are inconsistent across offices and not written in one clear place.
+- **Inconsistent online data:** Facility addresses, phone numbers, and operating hours differ across sources; some are outdated or incomplete.
+- **High cognitive burden:** For a PWD or caregiver, manually cross-checking multiple sources, calling offices, and reconciling conflicting information is time-consuming and mentally exhausting.
 
-## 3. Target Users and Use Cases
+The Capstone project addresses these issues by building a **Nairobi-focused assistant** that unifies curated data with light web search, applies accessibility-aware reasoning, and presents concise recommendations.
 
-Primary users:
+---
 
-- Adults with mobility, visual, hearing, or cognitive disabilities in Kenyan counties.
-- Parents and caregivers of children with disabilities.
-- Community-based organisations and disability advocates who support multiple clients.
+## 3. Minimum Viable Product (MVP)
 
-Example use cases:
+The MVP is intentionally narrow and implementable in a Kaggle environment:
 
-- A wheelchair user in Kisumu wants to find a public facility where they can renew their NCPWD card without facing steep stairs.
-- A deaf user in Nairobi wants to know which hospitals have sign-language interpreters or SMS-based triage lines.
-- A parent of a child with cerebral palsy in Mombasa wants to locate physiotherapy services that are both affordable and physically accessible.
+- **Curated Nairobi dataset**
+  - A small but realistic dataset of **Nairobi clinics, hospitals, and social service offices** with basic accessibility annotations.
+  - Stored as CSV/Parquet and loaded directly in the notebook.
 
-## 4. Agentic Architecture
+- **Multi-agent workflow**
+  - A four-agent pipeline (Intake/Profile → Search → Reasoning/Summary → Recommendation) orchestrated with ADK multi-agent constructs.
 
-The system will use a **multi-agent architecture** composed of specialised agents orchestrated via ADK:
+- **At least two tools**
+  - **DatasetSearchTool:** custom Python tool that filters and ranks Nairobi facilities based on location, service type, and accessibility fields.
+  - **WebEnrichmentTool:** wrapper around ADK’s `google_search` to fetch short snippets or descriptions for a subset of facilities (optional and configurable for deterministic runs).
 
-1. **Intake and Profile Agent**
-   - Collects user profile: location, disability type, mobility and communication needs, and preferred language.
-   - Normalises responses into a structured “Accessibility Profile”.
-   - Stores key details in long-term memory for future sessions.
+- **Memory**
+  - Use `InMemorySessionService` and an ADK memory service to retain the user’s profile (disability type, preferred area, language preference) and last recommended facilities across turns.
 
-2. **Data and Research Agent**
-   - Uses tools to query:
-     - Static service directories stored as CSV/Parquet files in the project (e.g., health facilities, social services, NGO centres).
-     - Web search (via the built-in `google_search` tool) for additional details such as accessibility statements or photos.
-   - Can run in parallel over multiple data sources where beneficial.
+- **Evaluation scenarios**
+  - 8–10 Nairobi-specific scenarios representing different disability types and subcounties.
 
-3. **Accessibility Reasoning Agent**
-   - Interprets raw data and heuristically scores the accessibility of each candidate service for the current user’s profile.
-   - For example: mark facilities with ramps as high-suitability for wheelchair users, and discount those without clear access information.
+- **Logging / observability**
+  - Use ADK logging plugins to capture prompts, tool calls, and intermediate state for debugging and evaluation.
 
-4. **Recommendation and Follow-up Agent**
-   - Produces final, user-friendly recommendations.
-   - Suggests next actions (which documents to bring, typical queues, suggested time of day).
-   - Optionally summarises the conversation and saves it to memory as a brief “service plan”.
+- **Simple, convincing demo path**
+  - A single end-to-end workflow in the notebook that starts from a user query and ends with a ranked list of Nairobi facilities plus persisted memory, all visible through a `run_debug`-style trace.
 
-These agents are orchestrated using **SequentialAgent** (and optionally **ParallelAgent**) to clearly demonstrate multi-agent composition.
+The MVP explicitly does **not** attempt to be a nationwide or fully production-ready system; it is a tightly scoped, technically solid prototype.
 
-## 5. Key ADK Concepts Demonstrated
+---
 
-The project is explicitly designed to satisfy the Capstone requirement of using at least three core concepts, and in practice will aim to include more:
+## 4. Multi-Agent Architecture and Flow
 
-- **Multi-agent system**
-  - Intake and Profile Agent, Data and Research Agent, Accessibility Reasoning Agent, Recommendation and Follow-up Agent.
-  - Orchestrated via Sequential and Parallel agents.
+The system is organised as a clear agent graph with well-defined responsibilities and handoffs.
 
-- **Tools**
-  - Built-in tools: `google_search` for web results.
-  - Custom Python tools:
-    - Service-directory lookups over local datasets (e.g., filter health facilities by county and type).
-    - Simple scoring utilities that assign accessibility scores.
-  - Optional MCP or OpenAPI tools to wrap local datasets behind a consistent interface.
+### 4.1 Agents and Components
 
-- **Sessions and Memory**
-  - Use `InMemorySessionService` for conversational state.
-  - Use a memory service to persist user profiles (disability type, base location, language preferences) across sessions.
-  - Demonstrate how the agent can recall a returning user and avoid re-asking every question.
+1. **Intake/Profile Agent**
+   - **Input:** Natural-language request such as “I use a wheelchair and live in Embakasi; I need a public clinic for follow-up visits.”
+   - **Responsibilities:**
+     - Ask minimal clarifying questions (location, disability type, mobility/communication constraints, service type: clinic vs NCPWD vs social services).
+     - Normalise inputs into a structured **User Profile** object, e.g.:
+       - `disability_type`, `mobility_needs`, `communication_needs`
+       - `preferred_subcounty`, `backup_subcounty`
+       - `service_category` (clinic / hospital / NCPWD / social_service)
+     - Store the profile into session + memory for reuse by downstream agents and future sessions.
+   - **Output to next agent:** `UserProfile` JSON-like structure.
 
-- **Context Engineering**
-  - Implement context compaction: summarise long search histories and recommendations into short notes that can fit within model context.
-  - Carefully design system and agent instructions to emphasise accessibility, Kenyan context, and safety.
+2. **Search Agent (Dataset + Web)**
+   - **Input:** `UserProfile` from Intake/Profile Agent.
+   - **Responsibilities:**
+     - Call **DatasetSearchTool** to filter the Nairobi dataset by service category and (sub)county proximity.
+     - Sort and return a small candidate set (e.g., top 5–10 facilities).
+     - Optionally call **WebEnrichmentTool** (backed by `google_search`) to retrieve one or two short snippets per facility (description, recent notes), when internet access and quotas permit.
+   - **Output to next agent:** `CandidateFacilities` list with structured fields + optional web snippets.
 
-- **Observability and Agent Quality**
-  - Add logging plugins to capture prompts, tool calls, and intermediate decisions.
-  - Optionally track simple metrics (e.g., number of tools invoked, latency per query).
-  - Use at least one small evaluation harness (prompt-based evaluation) to rate answer usefulness and correctness for a set of test scenarios.
+3. **Reasoning/Summary Agent**
+   - **Input:** `UserProfile` + `CandidateFacilities`.
+   - **Responsibilities:**
+     - Compute an **accessibility-aware score** for each candidate using dataset fields:
+       - Mobility fit (ramps, step-free access, lifts, distance).
+       - Hearing fit (sign-language support, SMS/WhatsApp contact options).
+       - Visual fit (good signage, staff assistance, clear directions).
+     - Generate a concise, structured **ScoredFacilities** summary including justifications for top candidates.
+     - Apply **context compaction**: condense the profile + candidate reasoning into a short textual summary that can be carried forward without overloading context.
+   - **Output to next agent:** `ScoredFacilities` list + `ContextSummary`.
 
-- **Agent Evaluation**
-  - Create a small synthetic evaluation set: e.g., 10–20 realistic PWD scenarios.
-  - Use ADK evaluation patterns to run automatic or semi-automatic checks comparing outputs against expected attributes (e.g., “mentions ramp”, “mentions county name”, “contains clear next steps”).
+4. **Recommendation Agent**
+   - **Input:** `ScoredFacilities` + `ContextSummary`.
+   - **Responsibilities:**
+     - Produce a user-facing recommendation in clear, non-technical language.
+     - Highlight the **top 2–3 Nairobi facilities**, explicitly describing:
+       - Where they are (subcounty/landmarks).
+       - Why they fit the user’s accessibility and service needs.
+       - What to bring or expect (e.g., NCPWD documents, clinic hours) based on the dataset/meta.
+     - Save a concise **Service Plan** summary to memory (profile + top facilities) so that follow-up questions such as “remind me of the options in Westlands” can be answered using memory + lightweight search.
 
-- **A2A Protocol (optional stretch goal)**
-  - Expose the Data and Research Agent as a separate A2A-compatible service.
-  - Have the main Navigator agent consume it as a remote `RemoteA2aAgent`, showing how Kenyan NGOs could plug in their own resource catalogues.
+5. **Memory Layer**
+   - `InMemorySessionService` to maintain the ongoing conversation state.
+   - An ADK memory service (e.g., `InMemoryMemoryService`) to persist:
+     - User profiles.
+     - Context summaries.
+     - The last recommended service set per user.
 
-- **Agent Deployment (optional bonus)**
-  - Package the Navigator as an ADK app suitable for deployment to Vertex AI Agent Engine, following the course’s deployment patterns.
+6. **Context Compaction**
+   - After each full recommendation, the Reasoning/Summary Agent writes a compact `ContextSummary` that replaces long past interactions in subsequent calls.
+   - This keeps the effective context small while preserving key facts.
 
-## 6. Data and Tools
+7. **Logging and Metrics**
+   - Use ADK logging plugin(s) to log:
+     - Agent invocations.
+     - Tool calls (dataset search, web search).
+     - Latency per step and number of candidates per stage.
+   - Logs are stored to a file (e.g., `logger.log`) for inspection within the Kaggle Notebook.
 
-Because many Kenyan datasets are not provided via stable APIs, the project will focus on **reproducible local datasets**:
+8. **Evaluation Suite**
+   - A separate notebook cell or module that replays predefined scenarios through the entire agent graph.
+   - Collects outputs and scores them against scenario-specific criteria (see Section 7).
 
-- Sample CSV/Parquet files created for:
-  - Public health facilities and social services in a subset of counties (e.g., Nairobi, Kisumu, Mombasa).
-  - Simple annotations for accessibility features (presence of ramps, sign-language support, approximate accessibility level).
-- These datasets can be:
-  - Created manually from public information for the demo.
-  - Included in the Kaggle dataset or GitHub repo for easy reuse.
+### 4.2 Flow Summary
 
-Tools planned:
+User query → **Intake/Profile Agent** → `UserProfile` → **Search Agent** → `CandidateFacilities` → **Reasoning/Summary Agent** → `ScoredFacilities` + `ContextSummary` → **Recommendation Agent** → final answer + `ServicePlan` stored in memory.
 
-- Custom tool for filtering and ranking services from the local dataset.
-- Google Search tool for enriching a subset of entries with up-to-date information (where allowed).
-- Optional MCP/OpenAPI wrappers so that the same logic can be reused if datasets are later exposed through APIs.
+---
 
-## 7. Implementation Plan
+## 5. Dataset Design (Nairobi Only)
 
-At a high level, the implementation will include:
+The project will use small, curated datasets scoped strictly to Nairobi.
 
-- ADK-based Python agents for intake, research, reasoning, and recommendation.
-- A small configuration layer (e.g., Python settings) for counties and service types.
-- A notebook or script demonstrating end-to-end flows for several personas.
-- Clear logging and comments so other learners can understand how the system is wired together.
+### 5.1 Files
 
-The code will be shared either as a **Kaggle Notebook** or a **public GitHub repository**, as required by the Capstone submission guidelines.
+1. `nairobi_clinics.csv`
+   - Public and low-cost clinics and hospitals in Nairobi.
 
-## 8. Evaluation Plan
+2. `nairobi_social_services.csv`
+   - NCPWD offices, social protection desks, and disability-related helpdesks located in Nairobi.
 
-Evaluation will focus on both **user-centric quality** and **technical correctness**:
+3. `nairobi_accessible_services.parquet` (optional consolidated file)
+   - Combined and cleaned version for faster loading and querying.
 
-- Define 10–20 test scenarios (e.g., “Wheelchair user in Nairobi seeking a public clinic”, “Blind user in Kisumu looking for social protection services”).
-- For each scenario, run the Navigator and check:
-  - Does it find at least one plausible service in the right county?
-  - Does the explanation mention relevant accessibility details?
-  - Is the language clear and non-stigmatising?
+### 5.2 Core Schema (shared fields)
 
-Where possible, simple automatic checks (string or tag-based) will be combined with manual review, and the evaluation harness will be documented in the notebook.
+Each row represents a facility or office with fields such as:
 
-## 9. Risks and Limitations
+- `facility_id` (string, primary key)
+- `facility_name` (string)
+- `category` (enum: `clinic`, `hospital`, `ncpwd_office`, `social_service`)
+- `subcounty` (e.g., `Westlands`, `Embakasi East`, `Langata`)
+- `ward` (string)
+- `neighbourhood_landmark` (string, e.g., “near Kenyatta Market”)
+- `latitude`, `longitude` (floats, optional for approximate mapping)
+- `managing_agency` (e.g., `County`, `National MoH`, `NGO`)
+- `services_offered` (short text list)
 
-- **Data completeness:** Real-world accessibility data is limited. For now, the project will rely on illustrative but limited datasets, clearly labelled as such.
-- **Changing information:** Service availability and accessibility features can change; static datasets may become outdated without active maintenance.
-- **Not a replacement for lived experience:** The Navigator is meant to reduce information barriers, not to replace consultation with PWD organisations or lived expertise.
+### 5.3 Accessibility Scoring Fields
 
-These limitations will be clearly communicated in the documentation and user messaging.
+To support reasoning, each row will also have accessibility-specific fields:
 
-## 10. Future Extensions
+- `has_ramp` (bool)
+- `has_elevator_or_step_free_entry` (bool)
+- `has_accessible_toilet` (bool)
+- `has_sign_language_support` (bool)
+- `supports_text_based_contact` (bool, e.g., SMS/WhatsApp)
+- `visual_signage_quality` (enum: `low`, `medium`, `high`)
+- `crowding_level` (enum: `low`, `medium`, `high`, approximate)
+- `approx_cost_level` (enum: `free`, `low`, `moderate`)
+- `mobility_score` (0–3)
+- `hearing_score` (0–3)
+- `visual_score` (0–3)
+- `notes` (short free text)
+- `data_source` (e.g., `MoH list`, `NCPWD site`, `manual survey`)
+- `last_verified_date` (date string)
 
-If time allows, future improvements could include:
+The `*_score` fields (0=not suitable, 3=very suitable) allow the Reasoning/Summary Agent to combine multiple fields into a single accessibility ranking for each disability category.
 
-- Adding more counties and service types (education, employment centres, legal aid).
-- Supporting Kiswahili and local languages to widen accessibility.
-- Integrating feedback loops where users can rate service accessibility and update the knowledge base.
-- Collaborating with Kenyan DPOs and NGOs to refine the scoring logic and datasets.
+### 5.4 Example Rows
 
-Overall, this Capstone aims to demonstrate how **agentic systems built with ADK** can support inclusion and accessibility for Kenyan PWDs, while showcasing multiple core concepts from the 5‑Day AI Agents Intensive course.
+| facility_id | facility_name                        | category      | subcounty | ward       | has_ramp | has_sign_language_support | mobility_score | hearing_score | notes                                      |
+|------------|---------------------------------------|--------------|----------|-----------|----------|---------------------------|----------------|--------------|--------------------------------------------|
+| CLN-001    | Mbagathi County Hospital Outpatient  | clinic       | Langata  | Nairobi West | true     | false                     | 3              | 1            | Ramp at main entrance; busy mornings.      |
+| SSC-010    | NCPWD Upper Hill Service Office      | ncpwd_office | Kibra    | Upper Hill | true     | true                      | 2              | 3            | Lift in building; KSL interpreter on some days. |
+
+### 5.5 Curation Strategy
+
+- **Manually curated base:**
+  - 30–60 Nairobi facilities drawn from public MoH lists, NCPWD information, and NGO directories, cleaned and standardised offline before loading into the notebook.
+- **Programmatic enrichment (optional):**
+  - A one-time or batched process (outside the main demo run) may use `google_search` to fetch short descriptions or confirm addresses for a subset of facilities.
+  - The enriched text snippets can either be stored back into the dataset or used at runtime by the Search Agent for additional context.
+
+This approach keeps the dataset small, explainable, and version-controlled while still being realistic enough for the Capstone.
+
+---
+
+## 6. Demo Workflow (Single Polished Path)
+
+The primary demo will show one cohesive, end-to-end use case inside a Kaggle Notebook.
+
+**Scenario:**
+> A wheelchair user living near Donholm (Embakasi East) needs an affordable public clinic for regular check-ups.
+
+**Workflow:**
+
+1. **User input (notebook cell):**
+   - The user types a natural-language query describing their location (Donholm, Embakasi), wheelchair use, and preference for a public clinic.
+
+2. **Intake/Profile Agent:**
+   - Clarifies missing details if needed (e.g., preferred time of day, whether sign-language support is required).
+   - Produces a structured `UserProfile` and stores it in session + memory.
+
+3. **Search Agent:**
+   - Invokes **DatasetSearchTool** to filter `nairobi_clinics.csv` for clinics in Embakasi East (and optionally neighbouring subcounties) with `mobility_score ≥ 2` and `approx_cost_level ∈ {"free", "low"}`.
+   - Returns a short list of candidate facilities with key fields.
+   - Optionally calls **WebEnrichmentTool** for the top 3 results to fetch short web descriptions.
+
+4. **Reasoning/Summary Agent:**
+   - Scores each candidate clinic for the user’s profile (wheelchair user, regular visits, cost sensitivity).
+   - Produces `ScoredFacilities` plus a one-paragraph `ContextSummary` capturing why the top 2–3 clinics are preferred.
+
+5. **Recommendation Agent:**
+   - Generates a concise explanation listing the best 2–3 clinics, their subcounties/landmarks, and specific accessibility reasons.
+   - Writes a `ServicePlan` summary (profile + top clinics) into memory.
+
+6. **Notebook output:**
+   - Displays the final user-facing recommendation.
+   - Optionally shows a condensed debug view: which tools were called, how many candidates were filtered, and the top scores.
+
+7. **Follow-up query (memory demonstration):**
+   - The user asks “Remind me of the clinic you recommended in Embakasi East.”
+   - The system uses memory to retrieve the stored `ServicePlan` and answers without re-running the full search.
+
+This single polished path is realistic for a Capstone, yet clearly exercises the multi-agent workflow, tools, memory, and observability.
+
+---
+
+## 7. Evaluation Plan
+
+The evaluation plan combines **scenario-based testing** with **agent-level checks**.
+
+### 7.1 Nairobi-Specific Test Scenarios (8–10)
+
+Example scenarios (all within Nairobi):
+
+1. Wheelchair user in **Embakasi East** looking for a low-cost public clinic for monthly check-ups.
+2. Deaf user working in **Nairobi CBD** seeking an NCPWD office with **sign-language support** for card renewal.
+3. Blind user living in **Westlands** needing a clinic with good staff assistance and clear directions.
+4. Parent of a child with cerebral palsy in **Langata** looking for a clinic with physiotherapy services.
+5. Hearing-impaired user in **Dagoretti North** needing a social protection desk that supports SMS/WhatsApp communication.
+6. User with limited mobility in **Kibra** wanting the nearest facility with a reliable ramp and accessible toilet.
+7. Low-income wheelchair user in **Mathare** needing a **free or very low-cost** clinic for chronic care.
+8. Visually impaired user commuting through **Upper Hill** looking for an NCPWD or social office with clear signage and lift access.
+9. Wheelchair user frequently in **Westlands** during work hours needing a centrally located clinic.
+10. Mixed-disability household in **Embakasi West** needing information about both clinic services and social services in one session.
+
+### 7.2 Success Criteria
+
+For each scenario, we will check:
+
+- **Service relevance:** At least one recommended facility is in the correct or a clearly justified neighbouring subcounty/ward.
+- **Accessibility alignment:** The explanation references at least one relevant accessibility attribute for the user’s disability (e.g., ramp, sign-language, signage).
+- **Data consistency:** Recommendations do not contradict core dataset fields (e.g., do not claim a ramp where `has_ramp = false`).
+- **Clarity and brevity:** Response is understandable, avoids jargon, and fits within a reasonable length for screen readers.
+- **Tool usage:** Search Agent invokes dataset search at least once; web enrichment is used only when configured and does not dominate reasoning.
+
+### 7.3 Agent-Level Testing
+
+- **Intake/Profile Agent:**
+  - Test prompts simulating different ways users describe their disabilities and locations.
+  - Verify that the resulting `UserProfile` JSON correctly populates `disability_type`, `service_category`, and `preferred_subcounty`.
+
+- **Search Agent:**
+  - Unit tests calling **DatasetSearchTool** directly with synthetic profiles to validate filtering by `subcounty`, `category`, and accessibility scores.
+  - Edge cases: no suitable facilities in a subcounty, fallback to nearby areas.
+
+- **Reasoning/Summary Agent:**
+  - Provide synthetic `CandidateFacilities` lists and check that higher accessibility scores are consistently favoured.
+  - Validate that `ContextSummary` remains within a small token budget.
+
+- **Recommendation Agent:**
+  - Given fixed `ScoredFacilities`, verify that the agent:
+    - Mentions the correct top facilities.
+    - Includes at least one explicit accessibility justification.
+    - Writes a `ServicePlan` object to memory.
+
+### 7.4 Failure Analysis
+
+- Use log files and `run_debug` traces to inspect misbehaving scenarios.
+- Categorise failures into:
+  - **Data gaps** (dataset missing relevant facility or incorrect annotation).
+  - **Search issues** (filtering too strict/too loose).
+  - **Reasoning errors** (incorrect weighting of accessibility fields).
+  - **Presentation issues** (missing explanation, confusing wording).
+- For each category, document at least one example and propose small, practical fixes (e.g., adjust scoring rubric, correct dataset rows, tweak prompts).
+
+---
+
+## 8. Implementation Notes and Risks
+
+- **Technology stack:**
+  - ADK Python, Gemini models (e.g., `gemini-2.5-flash` / `gemini-2.5-flash-lite`).
+  - Kaggle Notebook or GitHub repository as the primary delivery format.
+
+- **Key risks:**
+  - **Small dataset size:** With a few dozen Nairobi facilities, coverage is limited. The proposal treats this as a prototyping constraint and documents it clearly.
+  - **Annotation accuracy:** Accessibility fields may be approximate; the project will emphasise that data is illustrative, not official.
+  - **Model behaviour variability:** LLM reasoning can be non-deterministic; the evaluation harness and logging help identify and mitigate major issues.
+
+- **Why Nairobi-only is strategic:**
+  - Enables higher-quality curation and more reliable evaluation.
+  - Keeps the project within Capstone time and resource limits.
+  - Provides a template that could later be extended to other Kenyan counties without redesigning the architecture.
+
+Overall, this proposal describes a **focused, technically grounded, Nairobi-scoped Capstone project** that demonstrates practical multi-agent design, tool integration, memory, observability, and evaluation using ADK in a way that is achievable within a single notebook.
